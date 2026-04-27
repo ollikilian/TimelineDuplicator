@@ -4,36 +4,42 @@
    "body": "local timelineNames = Pixera.Timelines.getTimelineNames()\r\nif timelineNames == nil then\r\n\treturn {}\r\nend\r\nreturn timelineNames\r\n",
    "kind": "func",
    "name": "getTimelineOptions",
+   "path": "TimelineDuplicator.getTimelineOptions",
    "slotStyle": "hidden"
   },
   {
    "body": "if self.helper == nil then\r\n\trequire \"pixcHelper\"\r\n\tself.helper = createPixcHelper(pixc, self())\r\nend\r\n\r\nlocal tlName = self.helper:getProperty(\"Timeline\", \"\")\r\nif tlName == nil or tlName == \"\" then\r\n\treturn {}\r\nend\r\n\r\nlocal tl = Pixera.Timelines.getTimelineFromName(tlName)\r\nif tl == nil then\r\n\treturn {}\r\nend\r\n\r\nlocal layerNames = Pixera.Timelines.Timeline.getLayerNames(tl)\r\nif layerNames == nil then\r\n\treturn {}\r\nend\r\nreturn layerNames\r\n",
    "kind": "func",
    "name": "getLayerOptions",
+   "path": "TimelineDuplicator.getLayerOptions",
    "slotStyle": "hidden"
   },
   {
    "body": "local topFolders = Pixera.Resources.getResourceFolders()\r\nif topFolders == nil then\r\n\treturn {}\r\nend\r\n\r\nlocal folderNames = {}\r\n\r\nlocal function collectFolders(folderList, prefix)\r\n\tfor i = 1, #folderList do\r\n\t\tlocal name = Pixera.Resources.ResourceFolder.getName(folderList[i])\r\n\t\tif name ~= nil then\r\n\t\t\tlocal fullPath = prefix .. name\r\n\t\t\tfolderNames[#folderNames + 1] = fullPath\r\n\t\t\tlocal subFolders = Pixera.Resources.ResourceFolder.getResourceFolders(folderList[i])\r\n\t\t\tif subFolders ~= nil and #subFolders > 0 then\r\n\t\t\t\tcollectFolders(subFolders, fullPath .. \"/\")\r\n\t\t\tend\r\n\t\tend\r\n\tend\r\nend\r\n\r\ncollectFolders(topFolders, \"\")\r\nreturn folderNames\r\n",
    "kind": "func",
    "name": "getResourceFolderOptions",
+   "path": "TimelineDuplicator.getResourceFolderOptions",
    "slotStyle": "hidden"
   },
   {
    "body": "return {\"By Order\", \"By Name\"}\r\n",
    "kind": "func",
    "name": "getMatchModeOptions",
+   "path": "TimelineDuplicator.getMatchModeOptions",
    "slotStyle": "hidden"
   },
   {
    "body": "return self()\r\n",
    "kind": "func",
    "name": "ref",
+   "path": "TimelineDuplicator.ref",
    "slotStyle": "leftNone;rightOut;triggerHidden"
   },
   {
-   "body": "-- Replaces clip resources on a layer from a resource folder.\r\n-- Returns the number of replaced clips.\r\nif layer == nil or folder == nil then\r\n\treturn 0\r\nend\r\n\r\nlocal clips = Pixera.Timelines.Layer.getClips(layer)\r\nif clips == nil or #clips == 0 then\r\n\tpixc.warning(currentActionFullName .. \": no clips found on layer\")\r\n\treturn 0\r\nend\r\n\r\nlocal resources = Pixera.Resources.ResourceFolder.getResources(folder)\r\nif resources == nil or #resources == 0 then\r\n\tpixc.warning(currentActionFullName .. \": no resources in folder\")\r\n\treturn 0\r\nend\r\n\r\nlocal replacedCount = 0\r\n\r\nif matchMode == \"By Name\" then\r\n\tlocal resMap = {}\r\n\tfor i = 1, #resources do\r\n\t\tlocal resName = Pixera.Resources.Resource.getName(resources[i])\r\n\t\tlocal resId = Pixera.Resources.Resource.getId(resources[i])\r\n\t\tif resName ~= nil and resId ~= nil then\r\n\t\t\tresMap[resName] = resId\r\n\t\tend\r\n\tend\r\n\tfor i = 1, #clips do\r\n\t\tlocal clipResName = Pixera.Timelines.Clip.getAssignedResourceName(clips[i])\r\n\t\tif clipResName ~= nil and resMap[clipResName] ~= nil then\r\n\t\t\tPixera.Timelines.Clip.assignResource(clips[i], resMap[clipResName], false)\r\n\t\t\treplacedCount = replacedCount + 1\r\n\t\t\tif doLog then\r\n\t\t\t\tpixc.log(currentActionFullName .. \": replaced \" .. clipResName)\r\n\t\t\tend\r\n\t\tend\r\n\tend\r\nelse\r\n\tlocal count = math.min(#clips, #resources)\r\n\tfor i = 1, count do\r\n\t\tlocal resId = Pixera.Resources.Resource.getId(resources[i])\r\n\t\tif resId ~= nil then\r\n\t\t\tPixera.Timelines.Clip.assignResource(clips[i], resId, false)\r\n\t\t\treplacedCount = replacedCount + 1\r\n\t\tend\r\n\tend\r\nend\r\n\r\nreturn replacedCount\r\n",
+   "body": "-- Replaces clip resources on a layer from a resource folder.\r\n-- Returns the number of replaced clips.\r\nif layer == nil or folder == nil then\r\n\treturn 0\r\nend\r\n\r\nlocal clips = Pixera.Timelines.Layer.getClips(layer)\r\nif clips == nil or #clips == 0 then\r\n\tpixc.log(self() .. \": no clips found on layer\")\r\n\treturn 0\r\nend\r\n\r\nlocal resources = Pixera.Resources.ResourceFolder.getResources(folder)\r\nif resources == nil or #resources == 0 then\r\n\tpixc.log(self() .. \": no resources in folder\")\r\n\treturn 0\r\nend\r\n\r\nlocal replacedCount = 0\r\n\r\nif matchMode == \"By Name\" then\r\n\tlocal resMap = {}\r\n\tfor i = 1, #resources do\r\n\t\tlocal resName = Pixera.Resources.Resource.getName(resources[i])\r\n\t\tlocal resId = Pixera.Resources.Resource.getId(resources[i])\r\n\t\tif resName ~= nil and resId ~= nil then\r\n\t\t\tresMap[resName] = resId\r\n\t\tend\r\n\tend\r\n\tfor i = 1, #clips do\r\n\t\tlocal clipResName = Pixera.Timelines.Clip.getAssignedResourceName(clips[i])\r\n\t\tif clipResName ~= nil and resMap[clipResName] ~= nil then\r\n\t\t\tPixera.Timelines.Clip.assignResource(clips[i], resMap[clipResName], false)\r\n\t\t\treplacedCount = replacedCount + 1\r\n\t\t\tif doLog then\r\n\t\t\t\tpixc.log(self() .. \": replaced \" .. clipResName)\r\n\t\t\tend\r\n\t\tend\r\n\tend\r\nelse\r\n\tlocal count = math.min(#clips, #resources)\r\n\tfor i = 1, count do\r\n\t\tlocal resId = Pixera.Resources.Resource.getId(resources[i])\r\n\t\tif resId ~= nil then\r\n\t\t\tPixera.Timelines.Clip.assignResource(clips[i], resId, false)\r\n\t\t\treplacedCount = replacedCount + 1\r\n\t\tend\r\n\tend\r\nend\r\n\r\nreturn replacedCount\r\n",
    "kind": "func",
    "name": "replaceClipsOnLayer",
+   "path": "TimelineDuplicator.replaceClipsOnLayer",
    "params": [
     {
      "name": "layer",
@@ -55,16 +61,18 @@
    "slotStyle": "hidden"
   },
   {
-   "body": "if self.helper == nil then\r\n\trequire \"pixcHelper\"\r\n\tself.helper = createPixcHelper(pixc, self())\r\nend\r\n\r\nlocal tlName = self.helper:getProperty(\"Timeline\", \"\")\r\nlocal layerName = self.helper:getProperty(\"Layer\", \"\")\r\nlocal folderName = self.helper:getProperty(\"Resource Folder\", \"\")\r\nlocal suffix = self.helper:getProperty(\"New Timeline Suffix\", \"_copy\")\r\nlocal matchMode = self.helper:getProperty(\"Match Mode\", \"By Order\")\r\nlocal doLog = self.helper.toBool(self.helper:getProperty(\"Log Messages\", \"true\"), true)\r\n\r\n-- Validate required properties\r\nif tlName == nil or tlName == \"\" then\r\n\tpixc.error(currentActionFullName .. \": no timeline selected. Please configure in properties.\")\r\n\treturn\r\nend\r\nif layerName == nil or layerName == \"\" then\r\n\tpixc.error(currentActionFullName .. \": no layer selected. Please configure in properties.\")\r\n\treturn\r\nend\r\nif folderName == nil or folderName == \"\" then\r\n\tpixc.error(currentActionFullName .. \": no resource folder selected. Please configure in properties.\")\r\n\treturn\r\nend\r\n\r\n-- Get source timeline\r\nlocal sourceTimeline = Pixera.Timelines.getTimelineFromName(tlName)\r\nif sourceTimeline == nil then\r\n\tpixc.error(currentActionFullName .. \": timeline not found: \" .. tlName)\r\n\treturn\r\nend\r\n\r\n-- Duplicate timeline (false = keep clips and cues)\r\nlocal newTimeline = Pixera.Timelines.Timeline.duplicateThis(sourceTimeline, false)\r\nif newTimeline == nil then\r\n\tpixc.error(currentActionFullName .. \": failed to duplicate timeline\")\r\n\treturn\r\nend\r\n\r\nlocal newName = tlName .. suffix\r\nPixera.Timelines.Timeline.setName(newTimeline, newName)\r\nif doLog then\r\n\tpixc.log(currentActionFullName .. \": duplicated timeline as \" .. newName)\r\nend\r\n\r\n-- Get target layer on the duplicated timeline\r\nlocal targetLayer = Pixera.Timelines.Timeline.getLayerFromName(newTimeline, layerName)\r\nif targetLayer == nil then\r\n\tpixc.error(currentActionFullName .. \": layer not found on duplicated timeline: \" .. layerName)\r\n\treturn\r\nend\r\n\r\n-- Get resource folder\r\nlocal resFolder = Pixera.Resources.getResourceFolderWithNamePath(folderName)\r\nif resFolder == nil then\r\n\tpixc.error(currentActionFullName .. \": resource folder not found: \" .. folderName)\r\n\treturn\r\nend\r\n\r\n-- Replace clips\r\nlocal replacedCount = self.replaceClipsOnLayer(targetLayer, resFolder, matchMode, doLog)\r\npixc.log(currentActionFullName .. \": done - replaced \" .. replacedCount .. \" clips in \" .. newName)\r\n",
+   "body": "if self.helper == nil then\r\n\trequire \"pixcHelper\"\r\n\tself.helper = createPixcHelper(pixc, self())\r\nend\r\n\r\nlocal tlName = self.helper:getProperty(\"Timeline\", \"\")\r\nlocal layerName = self.helper:getProperty(\"Layer\", \"\")\r\nlocal folderName = self.helper:getProperty(\"Resource Folder\", \"\")\r\nlocal suffix = self.helper:getProperty(\"New Timeline Suffix\", \"_copy\")\r\nlocal matchMode = self.helper:getProperty(\"Match Mode\", \"By Order\")\r\nlocal doLog = self.helper.toBool(self.helper:getProperty(\"Log Messages\", \"true\"))\r\n\r\n-- Validate required properties\r\nif tlName == nil or tlName == \"\" then\r\n\tpixc.log(self() .. \": no timeline selected. Please configure in properties.\")\r\n\treturn\r\nend\r\nif layerName == nil or layerName == \"\" then\r\n\tpixc.log(self() .. \": no layer selected. Please configure in properties.\")\r\n\treturn\r\nend\r\nif folderName == nil or folderName == \"\" then\r\n\tpixc.log(self() .. \": no resource folder selected. Please configure in properties.\")\r\n\treturn\r\nend\r\n\r\n-- Get source timeline\r\nlocal sourceTimeline = Pixera.Timelines.getTimelineFromName(tlName)\r\nif sourceTimeline == nil then\r\n\tpixc.log(self() .. \": timeline not found: \" .. tlName)\r\n\treturn\r\nend\r\n\r\n-- Duplicate timeline (false = keep clips and cues)\r\nlocal newTimeline = Pixera.Timelines.Timeline.duplicateThis(sourceTimeline, false)\r\nif newTimeline == nil then\r\n\tpixc.log(self() .. \": failed to duplicate timeline\")\r\n\treturn\r\nend\r\n\r\nlocal newName = tlName .. suffix\r\nPixera.Timelines.Timeline.setName(newTimeline, newName)\r\nif doLog then\r\n\tpixc.log(self() .. \": duplicated timeline as \" .. newName)\r\nend\r\n\r\n-- Get target layer on the duplicated timeline\r\nlocal targetLayer = Pixera.Timelines.Timeline.getLayerFromName(newTimeline, layerName)\r\nif targetLayer == nil then\r\n\tpixc.log(self() .. \": layer not found on duplicated timeline: \" .. layerName)\r\n\treturn\r\nend\r\n\r\n-- Get resource folder\r\nlocal resFolder = Pixera.Resources.getResourceFolderWithNamePath(folderName)\r\nif resFolder == nil then\r\n\tpixc.log(self() .. \": resource folder not found: \" .. folderName)\r\n\treturn\r\nend\r\n\r\n-- Replace clips\r\nlocal replacedCount = self.replaceClipsOnLayer(targetLayer, resFolder, matchMode, doLog)\r\npixc.log(self() .. \": done - replaced \" .. replacedCount .. \" clips in \" .. newName)\r\n",
    "kind": "func",
    "name": "Execute",
-   "slotStyle": "leftIn;rightNone;triggerShown"
+   "path": "TimelineDuplicator.Execute",
+   "slotStyle": "leftIn;rightNone"
   },
   {
-   "body": "if self.helper == nil then\r\n\trequire \"pixcHelper\"\r\n\tself.helper = createPixcHelper(pixc, self())\r\nend\r\n\r\nlocal tlName = self.helper:getProperty(\"Timeline\", \"\")\r\nlocal layerName = self.helper:getProperty(\"Layer\", \"\")\r\nlocal folderList = self.helper:getProperty(\"Resource Folder List\", \"\")\r\nlocal matchMode = self.helper:getProperty(\"Match Mode\", \"By Order\")\r\nlocal doLog = self.helper.toBool(self.helper:getProperty(\"Log Messages\", \"true\"), true)\r\n\r\n-- Validate required properties\r\nif tlName == nil or tlName == \"\" then\r\n\tpixc.error(currentActionFullName .. \": no timeline selected. Please configure in properties.\")\r\n\treturn\r\nend\r\nif layerName == nil or layerName == \"\" then\r\n\tpixc.error(currentActionFullName .. \": no layer selected. Please configure in properties.\")\r\n\treturn\r\nend\r\nif folderList == nil or folderList == \"\" then\r\n\tpixc.error(currentActionFullName .. \": no folder list. Enter folder paths separated by semicolons.\")\r\n\treturn\r\nend\r\n\r\n-- Parse semicolon-separated folder paths\r\nlocal folderPaths = {}\r\nfor entry in folderList:gmatch(\"[^;]+\") do\r\n\tlocal trimmed = entry:match(\"^%%s*(.-)%%s*$\")\r\n\tif trimmed ~= nil and trimmed ~= \"\" then\r\n\t\tfolderPaths[#folderPaths + 1] = trimmed\r\n\tend\r\nend\r\n\r\nif #folderPaths == 0 then\r\n\tpixc.error(currentActionFullName .. \": no valid folder paths found in list\")\r\n\treturn\r\nend\r\n\r\npixc.log(currentActionFullName .. \": batch starting - \" .. #folderPaths .. \" variants\")\r\n\r\n-- Get source timeline\r\nlocal sourceTimeline = Pixera.Timelines.getTimelineFromName(tlName)\r\nif sourceTimeline == nil then\r\n\tpixc.error(currentActionFullName .. \": timeline not found: \" .. tlName)\r\n\treturn\r\nend\r\n\r\nfor fi = 1, #folderPaths do\r\n\tlocal folderPath = folderPaths[fi]\r\n\t-- Derive suffix from last segment of path\r\n\tlocal suffix = \"_\" .. (folderPath:match(\"([^/]+)$\") or folderPath)\r\n\r\n\tlocal newTimeline = Pixera.Timelines.Timeline.duplicateThis(sourceTimeline, false)\r\n\tif newTimeline == nil then\r\n\t\tpixc.error(currentActionFullName .. \": [\" .. fi .. \"/\" .. #folderPaths .. \"] failed to duplicate for \" .. folderPath)\r\n\telse\r\n\t\tlocal newName = tlName .. suffix\r\n\t\tPixera.Timelines.Timeline.setName(newTimeline, newName)\r\n\r\n\t\tlocal targetLayer = Pixera.Timelines.Timeline.getLayerFromName(newTimeline, layerName)\r\n\t\tif targetLayer == nil then\r\n\t\t\tpixc.error(currentActionFullName .. \": [\" .. fi .. \"/\" .. #folderPaths .. \"] layer not found: \" .. layerName)\r\n\t\telse\r\n\t\t\tlocal resFolder = Pixera.Resources.getResourceFolderWithNamePath(folderPath)\r\n\t\t\tif resFolder == nil then\r\n\t\t\t\tpixc.error(currentActionFullName .. \": [\" .. fi .. \"/\" .. #folderPaths .. \"] folder not found: \" .. folderPath)\r\n\t\t\telse\r\n\t\t\t\tlocal replacedCount = self.replaceClipsOnLayer(targetLayer, resFolder, matchMode, doLog)\r\n\t\t\t\tpixc.log(currentActionFullName .. \": [\" .. fi .. \"/\" .. #folderPaths .. \"] \" .. newName .. \" - \" .. replacedCount .. \" clips replaced\")\r\n\t\t\tend\r\n\t\tend\r\n\tend\r\nend\r\n\r\npixc.log(currentActionFullName .. \": batch complete\")\r\n",
+   "body": "if self.helper == nil then\r\n\trequire \"pixcHelper\"\r\n\tself.helper = createPixcHelper(pixc, self())\r\nend\r\n\r\nlocal tlName = self.helper:getProperty(\"Timeline\", \"\")\r\nlocal layerName = self.helper:getProperty(\"Layer\", \"\")\r\nlocal folderList = self.helper:getProperty(\"Resource Folder List\", \"\")\r\nlocal matchMode = self.helper:getProperty(\"Match Mode\", \"By Order\")\r\nlocal doLog = self.helper.toBool(self.helper:getProperty(\"Log Messages\", \"true\"))\r\n\r\n-- Validate required properties\r\nif tlName == nil or tlName == \"\" then\r\n\tpixc.log(self() .. \": no timeline selected. Please configure in properties.\")\r\n\treturn\r\nend\r\nif layerName == nil or layerName == \"\" then\r\n\tpixc.log(self() .. \": no layer selected. Please configure in properties.\")\r\n\treturn\r\nend\r\nif folderList == nil or folderList == \"\" then\r\n\tpixc.log(self() .. \": no folder list. Enter folder paths separated by semicolons.\")\r\n\treturn\r\nend\r\n\r\n-- Parse semicolon-separated folder paths\r\nlocal folderPaths = {}\r\nfor entry in folderList:gmatch(\"[^;]+\") do\r\n\tlocal trimmed = entry:match(\"^%s*(.-)%s*$\")\r\n\tif trimmed ~= nil and trimmed ~= \"\" then\r\n\t\tfolderPaths[#folderPaths + 1] = trimmed\r\n\tend\r\nend\r\n\r\nif #folderPaths == 0 then\r\n\tpixc.log(self() .. \": no valid folder paths found in list\")\r\n\treturn\r\nend\r\n\r\npixc.log(self() .. \": batch starting - \" .. #folderPaths .. \" variants\")\r\n\r\n-- Get source timeline\r\nlocal sourceTimeline = Pixera.Timelines.getTimelineFromName(tlName)\r\nif sourceTimeline == nil then\r\n\tpixc.log(self() .. \": timeline not found: \" .. tlName)\r\n\treturn\r\nend\r\n\r\nfor fi = 1, #folderPaths do\r\n\tlocal folderPath = folderPaths[fi]\r\n\t-- Derive suffix from last segment of path\r\n\tlocal suffix = \"_\" .. (folderPath:match(\"([^/]+)$\") or folderPath)\r\n\r\n\tlocal newTimeline = Pixera.Timelines.Timeline.duplicateThis(sourceTimeline, false)\r\n\tif newTimeline == nil then\r\n\t\tpixc.log(self() .. \": [\" .. fi .. \"/\" .. #folderPaths .. \"] failed to duplicate for \" .. folderPath)\r\n\telse\r\n\t\tlocal newName = tlName .. suffix\r\n\t\tPixera.Timelines.Timeline.setName(newTimeline, newName)\r\n\r\n\t\tlocal targetLayer = Pixera.Timelines.Timeline.getLayerFromName(newTimeline, layerName)\r\n\t\tif targetLayer == nil then\r\n\t\t\tpixc.log(self() .. \": [\" .. fi .. \"/\" .. #folderPaths .. \"] layer not found: \" .. layerName)\r\n\t\telse\r\n\t\t\tlocal resFolder = Pixera.Resources.getResourceFolderWithNamePath(folderPath)\r\n\t\t\tif resFolder == nil then\r\n\t\t\t\tpixc.log(self() .. \": [\" .. fi .. \"/\" .. #folderPaths .. \"] folder not found: \" .. folderPath)\r\n\t\t\telse\r\n\t\t\t\tlocal replacedCount = self.replaceClipsOnLayer(targetLayer, resFolder, matchMode, doLog)\r\n\t\t\t\tpixc.log(self() .. \": [\" .. fi .. \"/\" .. #folderPaths .. \"] \" .. newName .. \" - \" .. replacedCount .. \" clips replaced\")\r\n\t\t\tend\r\n\t\tend\r\n\tend\r\nend\r\n\r\npixc.log(self() .. \": batch complete\")\r\n",
    "kind": "func",
    "name": "BatchExecute",
-   "slotStyle": "leftIn;rightNone;triggerShown"
+   "path": "TimelineDuplicator.BatchExecute",
+   "slotStyle": "leftIn;rightNone"
   }
  ],
  "canHaveExternalConnections": false,
@@ -84,6 +92,11 @@
  "license": "1GNTlyr7sewU1l3S6nhV4gxYmOl7bS3Awe0/T6/2ijHcLWCoDCij+KAgWXL/vg/OZtznIL3vBq7yrrldbFtUGbw0fPbg2mzlTZ/gkmm0jcQIxndOUupMYjVoB8kRXA4gYRPoE9Km5H4QXI+R2CVFCf3BdfFWBLgLfgZzTuXqA98=",
  "name": "TimelineDuplicator",
  "properties": [
+  {
+   "cont": "true",
+   "name": "Auto Init",
+   "typeHint": "bool"
+  },
   {
    "cont": "",
    "name": "Timeline",
@@ -133,6 +146,7 @@
    "cont": "AV Stumpfl GmbH",
    "name": "Author",
    "readOnly": true,
+   "showName": false,
    "typeHint": "string"
   },
   {
@@ -145,7 +159,7 @@
   },
   {
    "cont": "www.pixera.one",
-   "name": "URL",
+   "name": "Url",
    "readOnly": true,
    "typeHint": "url"
   },
