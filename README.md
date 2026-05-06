@@ -1,169 +1,161 @@
 # TimelineDuplicator
 
-A Pixera Control module for duplicating timelines and replacing clip resources on a specified layer. Perfect for multi-language production workflows where you need to create variants of the same timeline with different audio/video tracks.
+A Pixera Control module that duplicates a source timeline and replaces clip resources on selected layers — supporting single-timeline and multi-language batch workflows.
 
-## Overview
+**Version:** 1.1  
+**Author:** AV Stumpfl GmbH  
+**Minimum Pixera Version:** 2.0.172  
+**Pixera API Revision:** 481
 
-TimelineDuplicator automates a common multi-language workflow in Pixera:
-- **Duplicate** a programmed timeline in its entirety (all cues, clips, keyframes, layer settings)
-- **Replace** clip resources on a designated layer with alternative content (different language audio, alternate video tracks, etc.)
-- **Scale** to batch operations for creating multiple language variants in one go
+---
 
-Instead of manually recreating timeline programming for each language, this module preserves all timing and structure while swapping only the media content.
+## What it does
 
-## Features
+TimelineDuplicator copies a source timeline and swaps out media on one or all layers. Three match modes cover different workflows:
 
-- 🎬 **Dynamic dropdowns** for Timeline, Layer, and Resource Folder selection
-- 🔄 **Two match modes**: By Order (sequential) or By Name (filename-based)
-- ⚡ **Single execution** (Execute) or **batch processing** (BatchExecute)
-- 📝 **Detailed logging** for troubleshooting
-- 🎯 **Recursive folder support** for nested resource structures
-- ✅ **Style-compliant** with Pixera Module and Lua Style Guides
+| Mode | Use case |
+|---|---|
+| **By Order** | Replace clips sequentially from a resource folder |
+| **Match by same name** | Replace only clips whose filename matches a resource in the folder |
+| **Suffix - Batch** | Create one timeline per language/version, auto-matching files by suffix |
+
+---
 
 ## Installation
 
-1. Download the latest `TimelineDuplicator.json` from the [Releases](https://github.com/yourusername/TimelineDuplicator/releases)
+1. Download `TimelineDuplicator.json` from [this repository](https://github.com/ollikilian/TimelineDuplicator/blob/main/TimelineDuplicator.json)
 2. Copy it to your Pixera Control user library folder:
    ```
    C:\ProgramData\AV Stumpfl\Pixera\control_library_user\
    ```
-3. Open Pixera Control and drag the module onto a Control page
-4. The module auto-initializes — verify in the Pixera log that initialization succeeded
-
-## Quick Start
-
-### Single Language Variant
-
-1. **Select source Timeline** from the Timeline dropdown
-2. **Select Layer** containing the clips to replace
-3. **Select Resource Folder** with the replacement media
-4. **Choose Match Mode**:
-   - **By Order**: Clip 1 gets Resource 1, Clip 2 gets Resource 2, etc.
-   - **By Name**: Each clip is matched to a resource with the same filename
-5. **Trigger Execute** on the module node
-
-Result: A new timeline appears (e.g., `MyShow_copy`) with all programming preserved and clips replaced.
-
-### Batch Multi-Language
-
-1. Configure Timeline, Layer, and Match Mode as above
-2. In the **Resource Folder List** property, enter folder paths separated by semicolons:
-   ```
-   Audio/English;Audio/German;Audio/French;Audio/Spanish
-   ```
-3. **Trigger BatchExecute**
-
-Result: Four new timelines are created (`MyShow_English`, `MyShow_German`, `MyShow_French`, `MyShow_Spanish`), each with content from the respective language folder.
-
-## Configuration
-
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| **Timeline** | Dropdown | (empty) | Source timeline to duplicate |
-| **Layer** | Dropdown | (empty) | Layer whose clips will be replaced (updates based on Timeline) |
-| **Resource Folder** | Dropdown | (empty) | Folder with replacement resources |
-| **Match Mode** | Dropdown | By Order | How clips are matched to resources |
-| **New Timeline Suffix** | String | `_copy` | Appended to the duplicated timeline name |
-| **Log Messages** | Bool | true | Enable detailed logging |
-| **Resource Folder List** | String | (empty) | Semicolon-separated paths for batch mode |
-
-## Recommended Folder Structure
-
-### By Order Matching
-```
-Resources/
-  Audio/
-    English/
-      Track_01.wav
-      Track_02.wav
-    German/
-      Track_01.wav
-      Track_02.wav
-```
-
-### By Name Matching
-```
-Resources/
-  Audio/
-    English/
-      Intro_EN.wav
-      Main_EN.wav
-    German/
-      Intro_DE.wav
-      Main_DE.wav
-```
-(Filenames can differ; same count and order matters)
-
-## Triggering
-
-The module exposes two functions:
-
-- **Execute** — Single duplication + replacement
-- **BatchExecute** — Batch processing with folder list
-
-Both appear as trigger-in slots on the module node and can be called via:
-- Right-click → Trigger
-- A connected Trigger node (button, hotkey, etc.)
-- A Cue action during timeline playback
-- Remote control (TCP, OSC, etc.)
-
-## Troubleshooting
-
-| Issue | Solution |
-|-------|----------|
-| Dropdowns are empty | Ensure module is initialized. Check project has timelines and resource folders. |
-| Layer dropdown empty | Select a Timeline first — Layer dropdown depends on Timeline selection. |
-| 0 clips replaced | Check filenames match exactly (By Name mode). Verify resource folder has files. Enable Log Messages. |
-| Wrong timeline name | Check the **New Timeline Suffix** property. In batch mode, suffix is derived from folder name. |
-| BatchExecute does nothing | Verify **Resource Folder List** uses semicolons as separators. Folder paths are case-sensitive. |
-
-## Documentation
-
-Full user documentation is included in the [Docs](./docs/) folder:
-- `TimelineDuplicator_Documentation.docx` — Complete module guide with screenshots and API reference
-
-## API Reference
-
-For developers integrating this module or building on it:
-
-- **`ref()`** — Returns module handle for chaining
-- **`Execute()`** — Performs single duplication with resource replacement
-- **`BatchExecute()`** — Iterates folder list, creating multiple variants
-- **Hidden functions**:
-  - `getTimelineOptions()`, `getLayerOptions()`, `getResourceFolderOptions()`, `getMatchModeOptions()` — Populate dropdowns dynamically
-  - `replaceClipsOnLayer()` — Core logic for clip replacement (reusable)
-
-## Requirements
-
-- **Pixera**: 2.0.172 or later
-- **Pixera Control**: With API access to Timelines and Resources namespaces
-- **Pixera API Revision**: 481 or compatible
-
-## Style & Quality
-
-This module adheres to:
-- [Pixera Module Style Guide](https://help.pixera.one/en_US/module-style-guide)
-- [Pixera Control Lua Style Guide](https://help.pixera.one/en_US/control-lua-style-guide)
-
-All code is lowerCamelCase with nil-checks, proper error/warning logging, and clean slot styling.
-
-## License
-
-MIT License — See [LICENSE](./LICENSE) for details.
-
-## Support
-
-- 📖 See [docs](./docs/) for detailed documentation
-- 🐛 Found a bug? [Open an issue](https://github.com/yourusername/TimelineDuplicator/issues)
-- 💬 Have ideas? [Discussions](https://github.com/yourusername/TimelineDuplicator/discussions)
-
-## Changelog
-
-See [CHANGELOG.md](./CHANGELOG.md) for version history and updates.
+3. Reload the library in Pixera Control — the module appears under user modules.
 
 ---
 
-**Created by**: AV Stumpfl GmbH  
-**Module Version**: 1.0  
-**Last Updated**: 2025  
-**Pixera API Rev**: 481
+## Properties
+
+| Property | Description |
+|---|---|
+| **Auto Init** | Initialise the module automatically on Pixera startup |
+| **Match Mode** | Select `By Order`, `Match by same name`, or `Suffix - Batch` |
+| **Source Timeline** | The timeline to duplicate |
+| **Source Layer** | The layer to apply resource replacement on, or `all Layers` |
+| **Resource Folder** | *(By Order / Match by same name only)* Folder containing replacement media |
+| **New Timeline Suffix** | *(By Order / Match by same name only)* Appended to the new timeline name |
+| **Suffix List** | *(Suffix - Batch only)* Comma/semicolon/colon/dot separated list, e.g. `DE,EN,FR` |
+| **CSV File Path** | *(Suffix - Batch only)* Full path to a CSV file containing suffixes |
+| **Import CSV** | Button — reads the CSV file path and loads suffixes into memory |
+| **Log Messages** | Toggle verbose clip-level logging in the Pixera log |
+
+---
+
+## Match Modes
+
+### By Order
+Duplicates the source timeline and replaces clips on the target layer with resources from the selected folder in sequence (clip 1 → resource 1, clip 2 → resource 2, etc.).
+
+**Required properties:** Source Timeline, Source Layer, Resource Folder, New Timeline Suffix
+
+### Match by same name
+Duplicates the source timeline and replaces only the clips whose assigned resource filename exactly matches a resource filename in the selected folder.
+
+**Required properties:** Source Timeline, Source Layer, Resource Folder, New Timeline Suffix
+
+### Suffix - Batch
+Creates one new timeline per suffix. For each suffix, searches **all resource folders** for media files named `OriginalClipName_suffix` (e.g. source clip `Video.mp4` → replacement `Video_DE.mp4` for suffix `DE`).
+
+New timelines are named `SourceTimeline_suffix` (e.g. `MyShow_DE`, `MyShow_EN`).
+
+**Required properties:** Source Timeline, Source Layer, Suffix List or CSV import
+
+> **Resource Folder** and **New Timeline Suffix** are not used in Suffix - Batch mode.
+
+---
+
+## Source Layer: all Layers
+
+When `all Layers` is selected, resource replacement runs on every layer of the duplicated timeline. In Suffix - Batch mode, each suffix timeline gets all its layers processed.
+
+---
+
+## CSV Import
+
+1. Prepare a CSV file where suffixes are listed — one per row or comma/semicolon/colon/dot separated.  
+   Example:
+   ```
+   DE,EN,FR
+   ES
+   IT
+   ```
+2. Paste the full file path into **CSV File Path** (e.g. `C:\Projects\suffixes.csv`).
+3. Click **Import CSV**.
+4. Check the Pixera log — the module reports how many suffixes were loaded, or an error if the file could not be read.
+
+Imported CSV suffixes take priority over the **Suffix List** property. To revert to the Suffix List, clear the CSV File Path and click Import CSV again (which will fail and clear the stored CSV data).
+
+---
+
+## Trigger Slot
+
+| Slot | Description |
+|---|---|
+| **Execute** | Runs the operation in whichever mode is currently selected |
+
+Both single-timeline and batch operations are triggered from the single **Execute** slot.
+
+---
+
+## Logging
+
+All results are written to the Pixera log:
+
+- `[module]: duplicated timeline as MyShow_copy` — single mode success
+- `[module]: [2/3] MyShow_EN - 4 clips replaced` — batch progress
+- `[module]: batch complete` — batch finished
+- `[module]: imported 3 suffixes from CSV: DE, EN, FR` — CSV import success
+- `[module]: failed to open file: C:\bad\path.csv` — CSV import failure
+
+Set **Log Messages** to `false` to suppress per-clip detail and keep only summary lines.
+
+---
+
+## Example: multi-language batch
+
+**Setup:**
+- Source Timeline: `MainShow`
+- Source Layer: `all Layers`
+- Match Mode: `Suffix - Batch`
+- Suffix List: `DE,EN,FR`
+
+**Media in resource library:**
+```
+Video_DE.mp4   Video_EN.mp4   Video_FR.mp4
+Intro_DE.mp4   Intro_EN.mp4   Intro_FR.mp4
+```
+
+**Result after Execute:**
+```
+MainShow_DE  ->  Video_DE.mp4, Intro_DE.mp4
+MainShow_EN  ->  Video_EN.mp4, Intro_EN.mp4
+MainShow_FR  ->  Video_FR.mp4, Intro_FR.mp4
+```
+
+---
+
+## Changelog
+
+### v1.1
+- Renamed **Timeline** to **Source Timeline**, **Layer** to **Source Layer**
+- Added `all Layers` option to Source Layer dropdown
+- Added **Suffix - Batch** match mode with full-library suffix search
+- Added **Suffix List** property and **CSV import** workflow
+- Merged `BatchExecute` into a single **Execute** trigger slot
+- Renamed `By Name` to `Match by same name`
+- Match Mode moved above Source Timeline in the property list
+- Updated Description property
+
+### v1.0
+- Initial release
+- Single Execute and BatchExecute triggers
+- By Order and By Name match modes
+- Resource Folder List for batch folder paths
