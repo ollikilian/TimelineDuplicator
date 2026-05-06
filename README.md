@@ -76,6 +76,20 @@ New timelines are named `SourceTimeline_suffix` (e.g. `MyShow_DE`, `MyShow_EN`).
 
 When `all Layers` is selected, resource replacement runs on every layer of the duplicated timeline. In Suffix - Batch mode, each suffix timeline gets all its layers processed.
 
+> **⚠ Performance warning — Suffix - Batch + all Layers**
+>
+> This combination is the most resource-intensive operation in the module. For every suffix, the module iterates over every layer, and for every clip on every layer it scans the entire resource library for a matching file. The workload scales as:
+>
+> **suffixes × layers × clips per layer × total resources in library**
+>
+> On large projects this can take a long time and **may cause Pixera to become unresponsive or trigger an API timeout**, which can leave partially-created timelines behind that need to be deleted manually.
+>
+> **Recommendations before running at scale:**
+> - Test with a single suffix first to estimate per-suffix duration.
+> - Reduce the resource library to only the files needed for the operation (move others to a separate folder temporarily).
+> - Use a specific **Source Layer** instead of `all Layers` when only one layer carries language-versioned content.
+> - Run during a maintenance window when the Pixera system is not live.
+
 ---
 
 ## CSV Import
