@@ -2,7 +2,7 @@
 
 A Pixera Control module that duplicates a source timeline and replaces clip resources on selected layers — supporting single-timeline and multi-language batch workflows.
 
-**Version:** 1.2  
+**Version:** 1.3  
 **Author:** AV Stumpfl GmbH  
 **Minimum Pixera Version:** 2.0.172  
 **Pixera API Revision:** 481
@@ -42,7 +42,7 @@ TimelineDuplicator copies a source timeline and swaps out media on one or all la
 | **Source Layer** | The layer to apply resource replacement on, or `all Layers` |
 | **Resource Folder (ignored on batch)** | *(By Order / Match by same name only)* Folder containing replacement media |
 | **New Timeline Suffix (ignored on batch)** | *(By Order / Match by same name only)* Appended to the new timeline name |
-| **Suffix List** | *(Suffix - Batch only)* Comma/semicolon/colon/dot separated list, e.g. `DE,EN,FR` |
+| **Suffix List (no underscore needed)** | *(Suffix - Batch only)* Comma/semicolon/colon/dot separated list, e.g. `DE,EN,FR`. Leading underscores are stripped automatically — enter `DE`, not `_DE`. |
 | **CSV File Path** | *(Suffix - Batch only)* Full path to a CSV file containing suffixes |
 | **Import CSV** | Button — reads the CSV file path and loads suffixes into memory |
 | **Discover Suffixes** | Button — scans the resource library and extracts suffixes from filenames; results logged for copy/paste |
@@ -68,9 +68,29 @@ Creates one new timeline per suffix. For each suffix, searches **all resource fo
 
 New timelines are named `SourceTimeline_suffix` (e.g. `MyShow_DE`, `MyShow_EN`).
 
-**Required properties:** Source Timeline, Source Layer, Suffix List or CSV import
+**Required properties:** Source Timeline, Source Layer, Suffix List (no underscore needed) or CSV import
 
 > **Resource Folder (ignored on batch)** and **New Timeline Suffix (ignored on batch)** are not used in Suffix - Batch mode.
+
+#### Suffix naming rules — important
+
+The module joins the original filename and the suffix with an underscore automatically. **Do not include an underscore in the suffix itself.**
+
+| Suffix List entry | What the module looks for | Result |
+|---|---|---|
+| `DE` ✓ | `Video_DE.mp4` | Correct |
+| `_DE` ✗ | `Video__DE.mp4` | Double underscore — file not found |
+
+Leading underscores are stripped automatically as a safety net, but the cleanest workflow is to never enter them.
+
+**Versioned files:** when a file carries both a language suffix and a version suffix, the **language must come before the version**:
+
+```
+myfile_en_v2.mp4   ← correct — suffix "en" matches myfile_en_v2
+myfile_v2_en.mp4   ← incorrect — suffix "en" would look for myfile_en_v2_en
+```
+
+The module extracts everything after the **last** underscore as the suffix, so version tags appended after the language tag will break the match. Always order: `name_language_version.ext`.
 
 ---
 
@@ -164,7 +184,7 @@ Example log output:
 [module]: discovered 3 suffix(es) - copy/paste into Suffix List: DE,EN,FR
 ```
 
-Copy `DE,EN,FR` directly into the **Suffix List** property.
+Copy `DE,EN,FR` directly into the **Suffix List (no underscore needed)** property.
 
 ---
 
@@ -244,6 +264,11 @@ MainShow_FR  ->  Video_FR.mp4, Intro_FR.mp4
 ---
 
 ## Changelog
+
+### v1.3
+- **Suffix List** renamed to **Suffix List (no underscore needed)** — the property name now makes the convention explicit
+- Leading underscores entered in the Suffix List are automatically stripped before processing, preventing the double-underscore (`__`) mismatch that caused no files to be found
+- README expanded with suffix naming rules and language-before-version ordering guidance
 
 ### v1.2
 - Renamed **Resource Folder** to **Resource Folder (ignored on batch)** and **New Timeline Suffix** to **New Timeline Suffix (ignored on batch)** for clarity

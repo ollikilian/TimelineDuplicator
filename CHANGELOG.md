@@ -4,6 +4,17 @@ All notable changes to TimelineDuplicator are documented here.
 
 ---
 
+## [1.3] — 2026-05-11
+
+### Changed
+- **Suffix List** property renamed to **Suffix List (no underscore needed)** — the display name now makes the `name_SUFFIX` convention explicit to operators.
+- Suffix parsing now strips leading underscores from every entry before processing. If an operator enters `_DE` instead of `DE`, the module silently corrects it rather than producing a double-underscore (`__`) mismatch that would cause no resources to be found.
+
+### Documentation
+- README expanded with a dedicated **Suffix naming rules** section, including a table showing correct vs. incorrect entries and an explanation of language-before-version ordering (`myfile_en_v2`, not `myfile_v2_en`).
+
+---
+
 ## [1.2] — 2026-05-06
 
 ### Added
