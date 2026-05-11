@@ -74,11 +74,8 @@ New timelines are named `SourceTimeline_suffix` (e.g. `MyShow_DE`, `MyShow_EN`).
 
 #### Suffix naming rules — important
 
-The module joins the original filename and the suffix with an underscore automatically. **Do not include an underscore in the suffix itself.**
-
 | Suffix List entry | What the module looks for | Result |
 |---|---|---|
-| `DE` ✓ | `Video_DE.mp4` | Correct |
 | `_DE` ✗ | `Video__DE.mp4` | Double underscore — file not found |
 
 Leading underscores are stripped automatically as a safety net, but the cleanest workflow is to never enter them.
