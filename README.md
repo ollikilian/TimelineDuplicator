@@ -76,9 +76,7 @@ New timelines are named `SourceTimeline_suffix` (e.g. `MyShow_DE`, `MyShow_EN`).
 
 | Suffix List entry | What the module looks for | Result |
 |---|---|---|
-| `_DE` ✗ | `Video__DE.mp4` | Double underscore — file not found |
-
-Leading underscores are stripped automatically as a safety net, but the cleanest workflow is to never enter them.
+| `_EN` ✗ | `Video_EN.mp4` | Use underscore in your media naming scheme!  |
 
 **Versioned files:** when a file carries both a language suffix and a version suffix, the **language must come before the version**:
 
