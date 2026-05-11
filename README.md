@@ -4,7 +4,7 @@ A Pixera Control module that duplicates a source timeline and replaces clip reso
 
 **Version:** 1.3  
 **Author:** AV Stumpfl GmbH  
-**Minimum Pixera Version:** 2.0.172  
+**Minimum Pixera Version:** 25.2 R12 
 **Pixera API Revision:** 481
 
 ---
