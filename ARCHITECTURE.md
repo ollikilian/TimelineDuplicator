@@ -1,6 +1,6 @@
 # TimelineDuplicator Module Architecture
 
-**Module Version:** 1.3  
+**Module Version:** 1.4  
 **Type:** Pixera Control Module (embedded Lua in JSON)  
 **Purpose:** Duplicates a source timeline and replaces clip resources on selected layer(s) using three distinct matching modes
 
@@ -29,6 +29,7 @@
 | Name | Type | Default | optionsSourceFunc | optionsAction | readOnly | showName |
 |------|------|---------|-------------------|---------------|----------|----------|
 | Suffix List (no underscore needed) | string | "" | — | — | false | true |
+| Source Suffix (to strip) | string | "" | — | — | false | true |
 | CSV File Path | string | "" | — | — | false | true |
 | Import CSV | button | "Import CSV" | — | self.importCsv | false | false |
 | Discover Suffixes | button | "Discover Suffixes" | — | self.discoverSuffixes | false | false |
@@ -83,13 +84,14 @@ Builds clip↔resource pairs within a single resource folder.
 
 Each pair entry: `{index, origResName, origHandle, replHandle, replName}`
 
-#### `findSuffixPairs(layer, allResources, suffix)` → array of pair tables
+#### `findSuffixPairs(layer, allResources, suffix, sourceSuffix)` → array of pair tables
 
 For each clip on the layer:
-1. Gets assigned resource name (e.g. `clip.mov`)
-2. Strips extension → `baseName` (e.g. `clip`)
-3. Constructs target: `baseName .. "_" .. suffix` (e.g. `clip_EN`)
-4. Iterates the flat `allResources` map; on first resource whose base name matches the target, creates a pair and breaks
+1. Gets assigned resource name (e.g. `clip_en.mov`)
+2. Strips extension → `baseName` (e.g. `clip_en`)
+3. If `sourceSuffix` is non-empty, strips `_sourceSuffix` from the end of `baseName` (e.g. `clip_en` → `clip`)
+4. Constructs target: `baseName .. "_" .. suffix` (e.g. `clip_FR`)
+5. Iterates the flat `allResources` map; on first resource whose base name matches the target, creates a pair and breaks
 
 Each pair entry: `{index, origResName, origHandle, replHandle, replName}`
 

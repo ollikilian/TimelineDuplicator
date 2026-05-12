@@ -4,6 +4,13 @@ All notable changes to TimelineDuplicator are documented here.
 
 ---
 
+## [1.4] — 2026-05-12
+
+### Added
+- **Source Suffix (to strip)** property (Suffix - Batch mode only, default empty) — when source clips and the source timeline already carry a language suffix (e.g. clips named `resource_en.mp4`, timeline named `show_en`), entering that suffix (e.g. `en`) causes the module to strip `_en` from each clip's base name and from the source timeline name before appending the new suffix. This enables correct resource matching (`resource_en` → `resource` → `resource_fr`) and correct timeline naming (`show_en` → `show` → `show_fr`) when the source is itself language-tagged. Leaving this property empty preserves existing behaviour.
+
+---
+
 ## [1.3] — 2026-05-11
 
 ### Changed

@@ -2,9 +2,9 @@
 
 A Pixera Control module that duplicates a source timeline and replaces clip resources on selected layers — supporting single-timeline and multi-language batch workflows.
 
-**Version:** 1.3  
+**Version:** 1.4  
 **Author:** AV Stumpfl GmbH  
-**Minimum Pixera Version:** 25.2 R12 
+**Minimum Pixera Version:** 25.2 R12
 **Pixera API Revision:** 481
 
 ---
@@ -43,6 +43,7 @@ TimelineDuplicator copies a source timeline and swaps out media on one or all la
 | **Resource Folder (ignored on batch)** | *(By Order / Match by same name only)* Folder containing replacement media |
 | **New Timeline Suffix (ignored on batch)** | *(By Order / Match by same name only)* Appended to the new timeline name |
 | **Suffix List (no underscore needed)** | *(Suffix - Batch only)* Comma/semicolon/colon/dot separated list, e.g. `DE,EN,FR`. Leading underscores are stripped automatically — enter `DE`, not `_DE`. |
+| **Source Suffix (to strip)** | *(Suffix - Batch only)* If source clips already carry a language suffix (e.g. `_en`), enter that suffix here (e.g. `en`). It is stripped from each clip's base name and from the source timeline name before the new suffix is applied, enabling correct matching and naming when the source itself is language-tagged. Leave empty if source clips have no existing suffix. |
 | **CSV File Path** | *(Suffix - Batch only)* Full path to a CSV file containing suffixes |
 | **Import CSV** | Button — reads the CSV file path and loads suffixes into memory |
 | **Discover Suffixes** | Button — scans the resource library and extracts suffixes from filenames; results logged for copy/paste |
@@ -71,6 +72,21 @@ New timelines are named `SourceTimeline_suffix` (e.g. `MyShow_DE`, `MyShow_EN`).
 **Required properties:** Source Timeline, Source Layer, Suffix List (no underscore needed) or CSV import
 
 > **Resource Folder (ignored on batch)** and **New Timeline Suffix (ignored on batch)** are not used in Suffix - Batch mode.
+
+#### Source Suffix (to strip)
+
+If your source timeline and its clips already carry a language suffix (e.g. `timeline_en`, `resource_en.mp4`), set **Source Suffix (to strip)** to that suffix (e.g. `en`). The module will:
+
+- Strip `_en` from each clip's base name before appending the new suffix, so `resource_en` → `resource` → `resource_fr` (matches `resource_fr.mp4`)
+- Strip `_en` from the source timeline name before appending the new suffix, so `timeline_en` → `timeline` → `timeline_fr`
+
+| Source Suffix (to strip) | Source clip | Target suffix | Looks for | New timeline |
+|---|---|---|---|---|
+| *(empty)* | `resource.mp4` | `fr` | `resource_fr.mp4` | `MyShow_fr` |
+| `en` | `resource_en.mp4` | `fr` | `resource_fr.mp4` | `MyShow_fr` |
+| `en` | `resource_en.mp4` | `en` | `resource_en.mp4` | `MyShow_en` |
+
+Leave empty when source clips have no existing language suffix.
 
 #### Suffix naming rules — important
 
@@ -259,6 +275,9 @@ MainShow_FR  ->  Video_FR.mp4, Intro_FR.mp4
 ---
 
 ## Changelog
+
+### v1.4
+- Added **Source Suffix (to strip)** property (Suffix - Batch only) — when source clips and the source timeline already carry a language suffix (e.g. `_en`), this suffix is stripped from clip base names and the source timeline name before the new suffix is applied, enabling correct resource matching and timeline naming from a language-tagged source
 
 ### v1.3
 - **Suffix List** renamed to **Suffix List (no underscore needed)** — the property name now makes the convention explicit
